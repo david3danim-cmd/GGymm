@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f0f1a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>RutinaGG</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg: #0f0f1a;
+      --card: #16213e;
+      --card-border: #1a1a4e;
+      --primary: #00d4aa;
+      --text: #ffffff;
+      --text2: #a0a0b0;
+      --danger: #ff4757;
+      --badge-compound: #e17055;
+      --badge-isolation: #74b9ff;
+      --badge-cardio: #fdcb6e;
+      --safe-top: env(safe-area-inset-top, 20px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      padding-top: var(--safe-top);
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+      text-align: center;
+      padding: 16px 20px 8px;
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .header p {
+      font-size: 14px;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+
+    /* ========== TABS ========== */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 12px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 6px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 2px solid transparent;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(0, 212, 170, 0.1);
+    }
+    .tab-day { display: block; font-size: 14px; font-weight: 700; }
+    .tab-type { display: block; font-size: 10px; margin-top: 2px; opacity: 0.7; }
+
+    /* ========== CONTENT ========== */
+    .content {
+      padding: 0 16px 120px;
+    }
+
+    /* ========== REST DAY ========== */
+    .rest-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .rest-day .rest-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    .rest-day h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .rest-day p {
+      color: var(--text2);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ========== EXERCISE CARD ========== */
+    .exercise-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .badge-compuesto { background: rgba(225, 112, 85, 0.2); color: var(--badge-compound); }
+    .badge-aislamiento { background: rgba(116, 185, 255, 0.2); color: var(--badge-isolation); }
+    .badge-cardio { background: rgba(253, 203, 110, 0.2); color: var(--badge-cardio); }
+    .badge-descanso { background: rgba(0, 212, 170, 0.2); color: var(--primary); }
+
+    .youtube-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 0, 0, 0.15);
+      color: #ff4444;
+      text-decoration: none;
+      font-size: 20px;
+    }
+
+    .exercise-name {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    .exercise-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text2);
+    }
+    .info-row .icon { font-size: 16px; min-width: 20px; text-align: center; }
+    .info-row .value { font-weight: 600; color: var(--text); }
+
+    .timer-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(0, 212, 170, 0.15);
+      color: var(--primary);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .timer-btn:active {
+      background: rgba(0, 212, 170, 0.3);
+    }
+
+    .detail-toggle {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .detail-text {
+      display: none;
+      margin-top: 8px;
+      padding: 12px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text2);
+    }
+    .detail-text.open { display: block; }
+
+    /* ========== TIMER OVERLAY ========== */
+    .timer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .timer-overlay.open { display: flex; }
+
+    .timer-display {
+      font-size: 80px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    .timer-label {
+      font-size: 16px;
+      color: var(--text2);
+      margin-bottom: 30px;
+    }
+    .timer-done .timer-display {
+      color: var(--primary);
+      animation: pulse 1s infinite;
+    }
+    .timer-done .timer-label {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .timer-progress {
+      width: 80%;
+      max-width: 300px;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+    .timer-progress-bar {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width 1s linear;
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .timer-ctrl {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .timer-ctrl:active { background: rgba(255,255,255,0.1); }
+    .timer-ctrl.pause-btn {
+      width: 80px;
+      height: 80px;
+      border-color: var(--primary);
+      color: var(--primary);
+      font-size: 22px;
+    }
+    .timer-close {
+      padding: 14px 40px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--danger);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ========== BOTTOM TAB (fixed) ========== */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0a0a15;
+      border-top: 1px solid var(--card-border);
+      padding: 8px 16px;
+      padding-bottom: calc(8px + var(--safe-bottom));
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>RutinaGG</h1>
+    <p>Tu rutina semanal</p>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="content" id="content"></div>
+
+  <!-- Timer Overlay -->
+  <div class="timer-overlay" id="timerOverlay">
+    <div class="timer-display" id="timerDisplay">02:00</div>
+    <div class="timer-label" id="timerLabel">Descansa...</div>
+    <div class="timer-progress">
+      <div class="timer-progress-bar" id="timerBar"></div>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-ctrl" onclick="adjustTimer(-15)">-15s</button>
+      <button class="timer-ctrl pause-btn" id="pauseBtn" onclick="togglePause()">| |</button>
+      <button class="timer-ctrl" onclick="adjustTimer(15)">+15s</button>
+    </div>
+    <button class="timer-close" onclick="closeTimer()">CERRAR</button>
+  </div>
+
+<script>
+// ================================================================
+// DATOS DE LA RUTINA (extraidos del PDF)
+// ================================================================
+const ROUTINE = [
+  {
+    id: "lunes",
+    day: "Lunes",
+    subtitle: "Fuerza Inferior",
+    icon: "\uD83C\uDFCB\uFE0F",
+    exercises: [
+      {
+        name: "Sentadilla Goblet c/ Mancuerna",
+        type: "Compuesto",
+        sets: "4 x (12-15, 10-12, 8-10, 6-8 \u2192 AMRAP)",
+        rest: 120,
+        restMax: 180,
+        info: "Alternativa perfecta para el cu\u00e1driceps en casa; la carga frontal exige fuerte estabilizaci\u00f3n del core.",
+        url: "https://www.youtube.com/results?search_query=sentadilla+goblet+mujer"
+      },
+      {
+        name: "Peso Muerto Rumano c/ Mancuernas",
+        type: "Compuesto",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 120,
+        restMax: null,
+        info: "Bisagra de cadera profunda esencial para el desarrollo de isquiosurales.",
+        url: "https://www.youtube.com/watch?v=Z3cvRMLpbGQ"
+      },
+      {
+        name: "Sentadilla B\u00falgara c/ Mancuernas",
+        type: "Compuesto",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 90,
+        restMax: null,
+        info: "Exige trabajo unilateral obligatorio; corrige asimetr\u00edas y activa gl\u00fateo medio.",
+        url: "https://www.youtube.com/results?search_query=como+hacer+sentadilla+bulgara+correctamente"
+      },
+      {
+        name: "Curl Femoral en M\u00e1quina Multifuncional",
+        type: "Aislamiento",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 90,
+        restMax: null,
+        info: "Aislamiento de la flexi\u00f3n de rodilla en el accesorio inferior de tu m\u00e1quina, clave para la parte posterior de la pierna.",
+        url: "https://www.youtube.com/watch?v=CBCPBnMzsMI"
+      },
+      {
+        name: "Extensi\u00f3n de Cu\u00e1driceps (Multifuncional)",
+        type: "Aislamiento",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 60,
+        restMax: null,
+        info: "Maximiza estr\u00e9s metab\u00f3lico en el cu\u00e1driceps distal usando el accesorio de piernas de la estaci\u00f3n.",
+        url: "https://www.youtube.com/watch?v=GMFFZnDz6wE"
+      }
+    ]
+  },
+  {
+    id: "martes",
+    day: "Martes",
+    subtitle: "Hipertrofia Superior",
+    icon: "\uD83D\uDCAA",
+    exercises: [
+      {
+        name: "Press de Pecho en M\u00e1quina Multifuncional",
+        type: "Compuesto",
+        sets: "4 x (12-15, 10-12, 8-10, 6-8 \u2192 AMRAP)",
+        rest: 120,
+        restMax: null,
+        info: "Empuje seguro y guiado que enfoca el trabajo directamente en el pectoral mayor.",
+        url: "https://www.youtube.com/watch?v=N7DjfGB8-xY"
+      },
+      {
+        name: "Jal\u00f3n al Pecho (Polea Alta de M\u00e1quina)",
+        type: "Compuesto",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 90,
+        restMax: null,
+        info: "Desarrollo prioritario de las fibras externas del dorsal ancho aprovechando la polea alta de la estaci\u00f3n.",
+        url: "https://www.youtube.com/watch?v=Zp3Dt2XPY5k"
+      },
+      {
+        name: "Remo Inclinado c/ Mancuernas",
+        type: "Compuesto",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 90,
+        restMax: null,
+        info: "Contracci\u00f3n escapular profunda, enfocada en romboides y trapecio medio.",
+        url: "https://www.youtube.com/watch?v=Z3cvRMLpbGQ"
+      },
+      {
+        name: "Extensi\u00f3n de Tr\u00edceps sobre Cabeza (Mancuerna)",
+        type: "Aislamiento",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 60,
+        restMax: null,
+        info: "Estiramiento m\u00e1ximo para reclutar la cabeza larga del tr\u00edceps.",
+        url: "https://www.youtube.com/results?search_query=extension+triceps+copa+mancuerna"
+      },
+      {
+        name: "Extensi\u00f3n de Tr\u00edceps (Polea Alta de M\u00e1quina)",
+        type: "Aislamiento",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 60,
+        restMax: null,
+        info: "Enfoque de aislamiento empujando hacia abajo desde la polea alta de la estaci\u00f3n.",
+        url: "https://www.youtube.com/results?search_query=extension+triceps+polea+alta"
+      },
+      {
+        name: "Cardio LISS (Caminata Inclinada)",
+        type: "Cardio",
+        sets: "1 x (30-45 min)",
+        rest: null,
+        restMax: null,
+        info: "Caminata r\u00e1pida 10-12% inclinaci\u00f3n. Oxida grasa aprovechando vaciado de gluc\u00f3geno.",
+        url: null
+      }
+    ]
+  },
+  {
+    id: "miercoles",
+    day: "Mi\u00e9rcoles",
+    subtitle: "Descanso",
+    icon: "\uD83D\uDCA4",
+    exercises: []
+  },
+  {
+    id: "jueves",
+    day: "Jueves",
+    subtitle: "Volumen Inferior",
+    icon: "\uD83D\uDD25",
+    exercises: [
+      {
+        name: "Peso Muerto R\u00edgido c/ Mancuernas",
+        type: "Compuesto",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 Rest-Pause)",
+        rest: 120,
+        restMax: 180,
+        info: "A diferencia del RDL, estira y trabaja casi de forma exclusiva los isquiotibiales.",
+        url: "https://www.youtube.com/results?search_query=peso+muerto+piernas+rigidas+mancuernas"
+      },
+      {
+        name: "Hip Thrust en el Suelo c/ Mancuerna",
+        type: "Compuesto",
+        sets: "4 x (10-12 con pausa isom\u00e9trica 2s)",
+        rest: 90,
+        restMax: null,
+        info: "Ejercicio para estimular hipertrofia en gl\u00fateo mayor apoyando los hombros en el piso o silla.",
+        url: "https://www.youtube.com/results?search_query=como+hacer+hip+thrust+con+mancuerna"
+      },
+      {
+        name: "Zancadas (Lunges) c/ Mancuernas",
+        type: "Compuesto",
+        sets: "3 x (12-15 \u2192 AMRAP)",
+        rest: 90,
+        restMax: null,
+        info: "Excelente reemplazo de la prensa de piernas; mejora el equilibrio y fatiga los cu\u00e1driceps de forma segura.",
+        url: "https://www.youtube.com/shorts/lMRGw-5_R40"
+      },
+      {
+        name: "Elevaci\u00f3n de Talones de Pie c/ Mancuernas",
+        type: "Aislamiento",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 AMRAP)",
+        rest: 60,
+        restMax: null,
+        info: "Extensi\u00f3n de tobillo de pie sosteniendo el peso para trabajar los gemelos de la pierna.",
+        url: "https://www.youtube.com/results?search_query=elevacion+talones+de+pie+mancuernas"
+      },
+      {
+        name: "Patada de Gl\u00fateo (Polea Baja M\u00e1quina)",
+        type: "Aislamiento",
+        sets: "3 x (12-15, 10-12, 6-8 \u2192 Rest-Pause)",
+        rest: 60,
+        restMax: null,
+        info: "Trabajo s\u00faper concentrado en los gl\u00fateos utilizando la cuerda de abajo de la estaci\u00f3n.",
+        url: "https://www.youtube.com/results?search_query=patada+gluteo+polea+baja"
+      }
+    ]
+  }
+];
+
+// ================================================================
+// ESTADO
+// ================================================================
+let activeTab = "lunes";
+let timerInterval = null;
+let timerSeconds = 0;
+let timerTotal = 0;
+let timerPaused = false;
+
+// ================================================================
+// RENDER TABS
+// ================================================================
+function renderTabs() {
+  const container = document.getElementById("tabs");
+  container.innerHTML = ROUTINE.map(day =>
+    `<button class="tab ${day.id === activeTab ? 'active' : ''}" onclick="switchTab('${day.id}')">
+      <span class="tab-day">${day.icon} ${day.day}</span>
+      <span class="tab-type">${day.subtitle}</span>
+    </button>`
+  ).join("");
+}
+
+function switchTab(id) {
+  activeTab = id;
+  renderTabs();
+  renderContent();
+}
+
+// ================================================================
+// RENDER CONTENT
+// ================================================================
+function renderContent() {
+  const container = document.getElementById("content");
+  const day = ROUTINE.find(d => d.id === activeTab);
+
+  // Dia de descanso
+  if (day.exercises.length === 0) {
+    container.innerHTML = `
+      <div class="rest-day">
+        <div class="rest-icon">${day.icon}</div>
+        <h2>Descanso / Recuperaci\u00f3n Activa</h2>
+        <p>Movilidad articular, caminata ligera, recuperaci\u00f3n muscular focalizada.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = day.exercises.map((ex, i) => {
+    const badgeClass = ex.type === "Compuesto" ? "badge-compuesto"
+      : ex.type === "Aislamiento" ? "badge-aislamiento"
+      : ex.type === "Cardio" ? "badge-cardio"
+      : "badge-descanso";
+
+    const restText = ex.rest
+      ? (ex.restMax ? `${ex.rest}-${ex.restMax}s` : `${ex.rest}s`)
+      : null;
+
+    const youtubeBtn = ex.url
+      ? `<a href="${ex.url}" target="_blank" rel="noopener" class="youtube-link">\u25B6</a>`
+      : "";
+
+    const timerBtn = ex.rest
+      ? `<button class="timer-btn" onclick="startTimer(${ex.rest})">
+          \u23F1 INICIAR TIMER (${restText})
+        </button>`
+      : "";
+
+    return `
+      <div class="exercise-card">
+        <div class="card-top">
+          <span class="badge ${badgeClass}">${ex.type}</span>
+          ${youtubeBtn}
+        </div>
+        <div class="exercise-name">${ex.name}</div>
+        <div class="exercise-info">
+          <div class="info-row">
+            <span class="icon">\uD83D\uDD04</span>
+            <span class="value">${ex.sets}</span>
+          </div>
+          ${restText ? `
+          <div class="info-row">
+            <span class="icon">\u23F3</span>
+            <span>Descanso: <span class="value">${restText}</span></span>
+          </div>` : ""}
+        </div>
+        ${timerBtn}
+        <button class="detail-toggle" onclick="toggleDetail(this)">Ver detalle \u25BC</button>
+        <div class="detail-text">${ex.info}</div>
+      </div>`;
+  }).join("");
+}
+
+function toggleDetail(btn) {
+  const detail = btn.nextElementSibling;
+  const isOpen = detail.classList.toggle("open");
+  btn.textContent = isOpen ? "Ocultar detalle \u25B2" : "Ver detalle \u25BC";
+}
+
+// ================================================================
+// TIMER
+// ================================================================
+function startTimer(seconds) {
+  timerSeconds = seconds;
+  timerTotal = seconds;
+  timerPaused = false;
+
+  document.getElementById("timerOverlay").classList.add("open");
+  document.getElementById("timerOverlay").classList.remove("timer-done");
+  document.getElementById("pauseBtn").textContent = "| |";
+  document.getElementById("timerLabel").textContent = "Descansa...";
+  updateTimerDisplay();
+
+  clearInterval(timerInterval);
+  timerInterval = setInterval(tick, 1000);
+}
+
+function tick() {
+  if (timerPaused) return;
+  timerSeconds--;
+  updateTimerDisplay();
+
+  if (timerSeconds <= 0) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    document.getElementById("timerOverlay").classList.add("timer-done");
+    document.getElementById("timerLabel").textContent = "\u00A1DESCANSO TERMINADO!";
+    // Vibracion
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200, 100, 400]);
+    }
+  }
+}
+
+function updateTimerDisplay() {
+  const min = Math.floor(Math.max(0, timerSeconds) / 60);
+  const sec = Math.max(0, timerSeconds) % 60;
+  document.getElementById("timerDisplay").textContent =
+    String(min).padStart(2, "0") + ":" + String(sec).padStart(2, "0");
+
+  const pct = timerTotal > 0 ? ((timerTotal - timerSeconds) / timerTotal) * 100 : 0;
+  document.getElementById("timerBar").style.width = Math.min(100, pct) + "%";
+}
+
+function togglePause() {
+  if (timerSeconds <= 0) return;
+  timerPaused = !timerPaused;
+  document.getElementById("pauseBtn").textContent = timerPaused ? "\u25B6" : "| |";
+  document.getElementById("timerLabel").textContent = timerPaused ? "Pausado" : "Descansa...";
+}
+
+function adjustTimer(delta) {
+  timerSeconds = Math.max(0, timerSeconds + delta);
+  timerTotal = Math.max(timerTotal, timerSeconds);
+  updateTimerDisplay();
+  // Si estaba en 0 y sumamos, reanudar
+  if (delta > 0 && !timerInterval) {
+    document.getElementById("timerOverlay").classList.remove("timer-done");
+    document.getElementById("timerLabel").textContent = "Descansa...";
+    timerInterval = setInterval(tick, 1000);
+  }
+}
+
+function closeTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  document.getElementById("timerOverlay").classList.remove("open");
+  document.getElementById("timerOverlay").classList.remove("timer-done");
+}
+
+// ================================================================
+// AUTO-SELECT TODAY
+// ================================================================
+function selectToday() {
+  const dayMap = { 1: "lunes", 2: "martes", 3: "miercoles", 4: "jueves" };
+  const today = dayMap[new Date().getDay()];
+  if (today) activeTab = today;
+}
+
+// ================================================================
+// INIT
+// ================================================================
+selectToday();
+renderTabs();
+renderContent();
+
+// Registrar service worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
